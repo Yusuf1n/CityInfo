@@ -41,7 +41,8 @@ public class PointsOfInterestController : ControllerBase
         return Ok(pointOfInterest);
     }
 
-    public ActionResult<PointOfInterestDto> CreatePointOfInterest(int cityId, PointOfInterestDto pointOfInterestDto)
+    [HttpPost]
+    public ActionResult<PointOfInterestDto> CreatePointOfInterest(int cityId, PointOfInterestForCreationDto pointOfInterestDto)
     {
         var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
         if (city == null)
