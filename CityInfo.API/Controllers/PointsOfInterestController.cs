@@ -20,7 +20,7 @@ public class PointsOfInterestController : ControllerBase
     {
         try
         {
-            throw new Exception("Exception sample");
+            //throw new Exception("Exception sample");
 
             var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
 
