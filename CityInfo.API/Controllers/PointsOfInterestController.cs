@@ -51,22 +51,37 @@ public class PointsOfInterestController : ControllerBase
     [HttpGet("{pointofinterestid}", Name = "GetPointOfInterest")]
     public ActionResult<PointOfInterestDto> GetPointOfInterest(int cityId, int pointOfInterestId)
     {
-        var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == cityId);
-
-        if (city == null)
+        try
         {
-            return NotFound();
-        }
 
-        // Find a point of interest
-        var pointOfInterest = city.PointsOfInterest.FirstOrDefault(c => c.Id == pointOfInterestId);
-        
-        if (pointOfInterest == null)
+            var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == cityId);
+
+            if (city == null)
+            {
+                _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
+
+                return NotFound();
+            }
+
+            // Find a point of interest
+            var pointOfInterest = city.PointsOfInterest.FirstOrDefault(c => c.Id == pointOfInterestId);
+
+            if (pointOfInterest == null)
+            {
+                _logger.LogInformation(
+                    $"Point of interest with id {pointOfInterestId} wasn't found for City id {cityId}");
+
+                return NotFound();
+            }
+
+            return Ok(pointOfInterest);
+        }
+        catch (Exception ex)
         {
-            return NotFound();
-        }
+            _logger.LogCritical($"Exception while getting point of interest with id {pointOfInterestId} for city with id {cityId}.", ex);
 
-        return Ok(pointOfInterest);
+            return StatusCode(500, "A problem occurred while handling your request");
+        }
     }
 
     [HttpPost]
