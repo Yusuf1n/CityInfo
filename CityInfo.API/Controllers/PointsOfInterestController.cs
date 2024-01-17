@@ -169,68 +169,102 @@ public class PointsOfInterestController : ControllerBase
     [HttpPatch("{pointofinterestid}")]
     public ActionResult PartiallyUpdatePointOfInterest(int cityId, int pointOfInterestId, JsonPatchDocument<PointOfInterestForUpdateDto> patchDocument)
     {
-        var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == cityId);
-
-        if (city == null)
+        try
         {
-            return NotFound();
+            var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == cityId);
+
+            if (city == null)
+            {
+                _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
+
+                return NotFound();
+            }
+
+            var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(c => c.Id == pointOfInterestId);
+
+            if (pointOfInterestFromStore == null)
+            {
+                _logger.LogInformation($"Point of interest with id {pointOfInterestId} wasn't found for City id {cityId}");
+
+                return NotFound();
+            }
+
+            var pointOfInterestToPatch = new PointOfInterestForUpdateDto()
+            {
+                Name = pointOfInterestFromStore.Name,
+                Description = pointOfInterestFromStore.Description,
+            };
+
+            patchDocument.ApplyTo(pointOfInterestToPatch, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("A problem occurred while handling your request");
+
+                return BadRequest();
+            }
+
+            if (!TryValidateModel(pointOfInterestToPatch))
+            {
+                _logger.LogError("A problem occurred while handling your request");
+
+                return BadRequest(ModelState);
+            }
+
+            pointOfInterestFromStore.Name = pointOfInterestToPatch.Name;
+            pointOfInterestFromStore.Description = pointOfInterestToPatch.Description;
+
+            _logger.LogInformation($"Successfully partially updated point of interest with id {pointOfInterestId} for City id {cityId}");
+
+            return NoContent();
         }
-
-        var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(c => c.Id == pointOfInterestId);
-
-        if (pointOfInterestFromStore == null)
+        catch (Exception ex)
         {
-            return NotFound();
+            _logger.LogCritical($"Exception while partially updating point of interest {pointOfInterestId} for city with id {cityId}.", ex);
+
+            return StatusCode(500, "A problem occurred while handling your request");
         }
-
-        var pointOfInterestToPatch = new PointOfInterestForUpdateDto()
-        {
-            Name = pointOfInterestFromStore.Name,
-            Description = pointOfInterestFromStore.Description,
-        };
-
-        patchDocument.ApplyTo(pointOfInterestToPatch, ModelState);
-
-        if (!ModelState.IsValid)
-        {
-            return BadRequest();
-        }
-
-        if (!TryValidateModel(pointOfInterestToPatch))
-        {
-            return BadRequest(ModelState);
-        }
-
-        pointOfInterestFromStore.Name = pointOfInterestToPatch.Name;
-        pointOfInterestFromStore.Description = pointOfInterestToPatch.Description;
-
-        return NoContent();
     }
 
     [HttpDelete("{pointOfInterestId}")]
     public ActionResult Delete(int cityId, int pointOfInterestId)
     {
-        var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == cityId);
-
-        if (city == null)
+        try
         {
-            return NotFound();
+            var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == cityId);
+
+            if (city == null)
+            {
+                _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
+
+                return NotFound();
+            }
+
+            var pointOfInterestFromStore = city.PointsOfInterest
+                .FirstOrDefault(c => c.Id == pointOfInterestId);
+
+            if (pointOfInterestFromStore == null)
+            {
+                _logger.LogInformation($"Point of interest with id {pointOfInterestId} wasn't found for City id {cityId}");
+
+                return NotFound();
+            }
+
+            city.PointsOfInterest.Remove(pointOfInterestFromStore);
+
+            _mailService.Send(
+                "Point of interest deleted.",
+                $"Point of interest {pointOfInterestFromStore.Name} with id {pointOfInterestFromStore.Id} was deleted");
+            
+            _logger.LogInformation($"Successfully deleted point of interest with id {pointOfInterestId} for City id {cityId}");
+
+            return NoContent();
         }
-
-        var pointOfInterestFromStore = city.PointsOfInterest
-            .FirstOrDefault(c => c.Id == pointOfInterestId);
-
-        if (pointOfInterestFromStore == null)
+        catch (Exception ex)
         {
-            return NotFound();
+            _logger.LogCritical($"Exception while deleting point of interest {pointOfInterestId} for city with id {cityId}.", ex);
+
+            return StatusCode(500, "A problem occurred while handling your request");
         }
-
-        city.PointsOfInterest.Remove(pointOfInterestFromStore);
-
-        _mailService.Send(
-            "Point of interest deleted.", 
-            $"Point of interest {pointOfInterestFromStore.Name} with id {pointOfInterestFromStore.Id} was deleted");
-
-        return NoContent();
     }
 }
