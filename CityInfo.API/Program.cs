@@ -1,6 +1,8 @@
 using CityInfo.API;
+using CityInfo.API.DbContexts;
 using CityInfo.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -35,6 +37,11 @@ builder.Services.AddTransient<IMailService, CloudMailService>();
 #endif
 
 builder.Services.AddSingleton<CitiesDataStore>();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+                      throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+builder.Services.AddDbContext<CityInfoContext>(dbContextOptions => dbContextOptions.UseSqlServer(connectionString)); 
 
 var app = builder.Build();
 
