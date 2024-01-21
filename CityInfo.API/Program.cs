@@ -43,6 +43,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<CityInfoContext>(dbContextOptions => dbContextOptions.UseSqlServer(connectionString)); 
 
+builder.Services.AddScoped<ICityInfoRepository, CityInfoRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
