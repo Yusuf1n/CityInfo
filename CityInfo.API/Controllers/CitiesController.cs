@@ -1,4 +1,5 @@
 ﻿using CityInfo.API.Models;
+using CityInfo.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Controllers;
@@ -7,31 +8,45 @@ namespace CityInfo.API.Controllers;
 [Route("api/cities")]
 public class CitiesController : ControllerBase
 {
-    private readonly CitiesDataStore _citiesDataStore;
+    private readonly ICityInfoRepository _cityInfoCityInfoRepository;
 
-    public CitiesController(CitiesDataStore citiesDataStore)
+    public CitiesController(ICityInfoRepository cityInfoCityInfoRepository)
     {
-        _citiesDataStore = citiesDataStore;
+        _cityInfoCityInfoRepository = cityInfoCityInfoRepository;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<CityDto>> GetCities()
+    public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities()
     {
-        return Ok(_citiesDataStore.Cities);
-    }
+        var cityEntities = await _cityInfoCityInfoRepository.GetCitiesAsync();
 
-    [HttpGet("{id}")]
-    public ActionResult<CityDto> GetCity(int id)
-    {
-        // Find City
-        var cityToReturn = _citiesDataStore.Cities
-            .FirstOrDefault(c => c.Id == id);
+        var results = new List<CityWithoutPointsOfInterestDto>();
 
-        if (cityToReturn == null)
+        foreach (var cityEntity in cityEntities)
         {
-            return NotFound();
+            results.Add(new CityWithoutPointsOfInterestDto
+            {
+                Id = cityEntity.Id,
+                Name = cityEntity.Name,
+                Description = cityEntity.Description
+            });
         }
 
-        return Ok(cityToReturn);
+        return Ok(results);
     }
+
+    //[HttpGet("{id}")]
+    //public ActionResult<CityDto> GetCity(int id)
+    //{
+    //    // Find City
+    //    var cityToReturn = _citiesDataStore.Cities
+    //        .FirstOrDefault(c => c.Id == id);
+
+    //    if (cityToReturn == null)
+    //    {
+    //        return NotFound();
+    //    }
+
+    //    return Ok(cityToReturn);
+    //}
 }
