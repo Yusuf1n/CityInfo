@@ -9,19 +9,19 @@ namespace CityInfo.API.Controllers;
 [Route("api/cities")]
 public class CitiesController : ControllerBase
 {
-    private readonly ICityInfoRepository _cityInfoCityInfoRepository;
+    private readonly ICityInfoRepository _cityInfoRepository;
     private readonly IMapper _mapper;
 
-    public CitiesController(ICityInfoRepository cityInfoCityInfoRepository, IMapper mapper)
+    public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)
     {
-        _cityInfoCityInfoRepository = cityInfoCityInfoRepository;
+        _cityInfoRepository = cityInfoRepository;
         _mapper = mapper;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities()
     {
-        var cityEntities = await _cityInfoCityInfoRepository.GetCitiesAsync();
+        var cityEntities = await _cityInfoRepository.GetCitiesAsync();
 
         return Ok(_mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntities));
     }
