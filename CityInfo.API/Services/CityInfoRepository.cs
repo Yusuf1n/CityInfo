@@ -25,7 +25,7 @@ public class CityInfoRepository : ICityInfoRepository
         if (includePointsOfInterest)
         {
             return await _context.Cities
-                                .Include(c => c.PointOfInterest)
+                                .Include(c => c.PointsOfInterest)
                                 .Where(c => c.Id == cityId)
                                 .FirstOrDefaultAsync();
         }
