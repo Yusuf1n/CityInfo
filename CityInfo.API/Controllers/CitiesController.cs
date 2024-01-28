@@ -14,8 +14,10 @@ public class CitiesController : ControllerBase
 
     public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)
     {
-        _cityInfoRepository = cityInfoRepository;
-        _mapper = mapper;
+        _cityInfoRepository = cityInfoRepository
+                  ?? throw new ArgumentNullException(nameof(cityInfoRepository));
+        _mapper = mapper
+                  ?? throw new ArgumentNullException(nameof(mapper));
     }
 
     [HttpGet]
