@@ -67,50 +67,43 @@ public class PointsOfInterestController : ControllerBase
         return Ok(_mapper.Map<PointOfInterestDto>(pointOfInterest));
     }
 
-    //[HttpPost]
-    //public ActionResult<PointOfInterestDto> CreatePointOfInterest(int cityId, PointOfInterestForCreationDto pointOfInterestDto)
-    //{
-    //    try
-    //    {
-    //        var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == cityId);
+    [HttpPost]
+    public async Task<ActionResult<PointOfInterestDto>> CreatePointOfInterest(int cityId, PointOfInterestForCreationDto pointOfInterest)
+    {
+        try
+        {
+            if (!await _cityInfoRepository.CityExistsAsync(cityId))
+            {
+                _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
 
-    //        if (city == null)
-    //        {
-    //            _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
+                return NotFound();
+            }
 
-    //            return NotFound();
-    //        }
+            var finalPointOfInterest = _mapper.Map<Entities.PointOfInterest>(pointOfInterest);
 
-    //        var maxPointOfInterestId = _citiesDataStore.Cities
-    //            .SelectMany(c => c.PointsOfInterest)
-    //            .Max(p => p.Id);
+            await _cityInfoRepository.AddPointOfInterestForCityAsync(cityId, finalPointOfInterest);
 
-    //        var finalPointOfInterest = new PointOfInterestDto()
-    //        {
-    //            Id = ++maxPointOfInterestId,
-    //            Name = pointOfInterestDto.Name,
-    //            Description = pointOfInterestDto.Description,
-    //        };
+            await _cityInfoRepository.SaveChangesAsync();
 
-    //        city.PointsOfInterest.Add(finalPointOfInterest);
+            var createdPointOfInterestToReturn = _mapper.Map<Models.PointOfInterestDto>(finalPointOfInterest);
 
-    //        _logger.LogInformation($"Successfully created point of interest '{finalPointOfInterest.Name}' (id: {finalPointOfInterest.Id}) for city with id {cityId}");
+            _logger.LogInformation($"Successfully created point of interest '{createdPointOfInterestToReturn.Name}' (id: {createdPointOfInterestToReturn.Id}) for city with id {cityId}");
 
-    //        return CreatedAtRoute("GetPointOfInterest",
-    //            new
-    //            {
-    //                cityId = cityId,
-    //                pointOfInterestId = finalPointOfInterest.Id
-    //            },
-    //            finalPointOfInterest);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogCritical($"Exception while creating point of interest for city with id {cityId}.", ex);
+            return CreatedAtRoute("GetPointOfInterest",
+                new
+                {
+                    cityId = cityId,
+                    pointOfInterestId = createdPointOfInterestToReturn.Id
+                },
+                createdPointOfInterestToReturn);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical($"Exception while creating point of interest for city with id {cityId}.", ex);
 
-    //        return StatusCode(500, "A problem occurred while handling your request");
-    //    }
-    //}
+            return StatusCode(500, "A problem occurred while handling your request");
+        }
+    }
 
     //[HttpPut("{pointofinterestid}")]
     //public ActionResult UpdatePointOfInterest(int cityId, int pointOfInterestId, PointOfInterestForUpdateDto pointOfInterest)
@@ -240,7 +233,7 @@ public class PointsOfInterestController : ControllerBase
     //        _mailService.Send(
     //            "Point of interest deleted.",
     //            $"Point of interest {pointOfInterestFromStore.Name} with id {pointOfInterestFromStore.Id} was deleted");
-            
+
     //        _logger.LogInformation($"Successfully deleted point of interest with id {pointOfInterestId} for City id {cityId}");
 
     //        return NoContent();
