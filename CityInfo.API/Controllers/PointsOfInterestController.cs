@@ -105,44 +105,42 @@ public class PointsOfInterestController : ControllerBase
         }
     }
 
-    //[HttpPut("{pointofinterestid}")]
-    //public ActionResult UpdatePointOfInterest(int cityId, int pointOfInterestId, PointOfInterestForUpdateDto pointOfInterest)
-    //{
-    //    try
-    //    {
-    //        var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == cityId);
+    [HttpPut("{pointofinterestid}")]
+    public async Task<ActionResult> UpdatePointOfInterest(int cityId, int pointOfInterestId, PointOfInterestForUpdateDto pointOfInterest)
+    {
+        try
+        {
+            if (!await _cityInfoRepository.CityExistsAsync(cityId))
+            {
+                _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
 
-    //        if (city == null)
-    //        {
-    //            _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
+                return NotFound();
+            }
 
-    //            return NotFound();
-    //        }
+            var pointOfInterestEntity = await _cityInfoRepository.GetPointOfInterestForCityAsync(cityId, pointOfInterestId);
 
-    //        // Find the point of interest
-    //        var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(c => c.Id == pointOfInterestId);
+            if (pointOfInterestEntity == null)
+            {
+                _logger.LogInformation($"Point of interest with id {pointOfInterestId} wasn't found for City id {cityId}");
 
-    //        if (pointOfInterestFromStore == null)
-    //        {
-    //            _logger.LogInformation($"Point of interest with id {pointOfInterestId} wasn't found for City id {cityId}");
+                return NotFound();
+            }
 
-    //            return NotFound();
-    //        }
+            _mapper.Map(pointOfInterest, pointOfInterestEntity);
 
-    //        pointOfInterestFromStore.Name = pointOfInterest.Name;
-    //        pointOfInterestFromStore.Description = pointOfInterest.Description;
+            await _cityInfoRepository.SaveChangesAsync();
 
-    //        _logger.LogInformation($"Successfully updated point of interest with id {pointOfInterestId} for City id {cityId}");
+            _logger.LogInformation($"Successfully updated point of interest with id {pointOfInterestId} for City id {cityId}");
 
-    //        return NoContent();
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogCritical($"Exception while updating point of interest {pointOfInterestId} for city with id {cityId}.", ex);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical($"Exception while updating point of interest {pointOfInterestId} for city with id {cityId}.", ex);
 
-    //        return StatusCode(500, "A problem occurred while handling your request");
-    //    }
-    //}
+            return StatusCode(500, "A problem occurred while handling your request");
+        }
+    }
 
     //[HttpPatch("{pointofinterestid}")]
     //public ActionResult PartiallyUpdatePointOfInterest(int cityId, int pointOfInterestId, JsonPatchDocument<PointOfInterestForUpdateDto> patchDocument)
