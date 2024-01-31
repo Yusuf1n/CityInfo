@@ -42,14 +42,14 @@ public class CityInfoRepository : ICityInfoRepository
 
     public async Task<PointOfInterest?> GetPointOfInterestForCityAsync(int cityId, int pointOfInterest)
     {
-        return await _context.PointOfInterests
+        return await _context.PointsOfInterest
             .Where(p => p.CityId == cityId && p.Id == pointOfInterest)
             .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId)
     {
-        return await _context.PointOfInterests
+        return await _context.PointsOfInterest
                             .Where(p => p.CityId == cityId)
                             .ToListAsync();
     }
