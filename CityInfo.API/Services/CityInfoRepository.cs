@@ -20,7 +20,7 @@ public class CityInfoRepository : ICityInfoRepository
                                 .ToListAsync();
     }
 
-    public async Task<IEnumerable<City>> GetCitiesAsync(string? name, string? searchQuery, int pageNumber, int pageSize)
+    public async Task<(IEnumerable<City>, PaginationMetadata)> GetCitiesAsync(string? name, string? searchQuery, int pageNumber, int pageSize)
     {
         // Collection to start from
         var collection = _context.Cities as IQueryable<City>;
@@ -40,11 +40,17 @@ public class CityInfoRepository : ICityInfoRepository
                         || a.Description != null && a.Description.Contains(searchQuery));
         }
 
-        return await collection
+        var totalItemCount = await collection.CountAsync();
+
+        var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber);
+
+        var collectionToReturn = await collection
             .OrderBy(c => c.Name)
             .Skip(pageSize * (pageNumber - 1))
             .Take(pageSize)
             .ToListAsync();
+
+        return (collectionToReturn, paginationMetadata);
     }
 
     public async Task<City?> GetCityAsync(int cityId, bool includePointsOfInterest)
