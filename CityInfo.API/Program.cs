@@ -64,6 +64,15 @@ builder.Services.AddAuthentication("Bearer")
         }
     );
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MustBeFromStokeOnTrent", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("city", "Stoke-on-Trent");
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
