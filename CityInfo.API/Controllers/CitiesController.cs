@@ -51,6 +51,9 @@ public class CitiesController : ControllerBase
     /// <returns>An IActionResult</returns>
     /// <response code="200">Returns the requested city</response>
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCity(int id, bool includePointsOfInterest = false)
     {
         var city = await _cityInfoRepository.GetCityAsync(id, includePointsOfInterest);
