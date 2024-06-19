@@ -20,3 +20,20 @@ Content-Type: application/json
   "name": "A name for testing",
   "description": "A description for testing"
 }
+
+###
+
+// Get a token 
+POST {{schema}}://{{hostname}}:{{port}}/api/authentication/authenticate
+Content-Type: application/json
+
+{
+  "username": "Test username",
+  "password": "Test password"
+}
+
+###
+
+// Authenticated GET request
+GET {{schema}}://{{hostname}}:{{port}}/api/v2/cities
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6Ill1c3VmIiwiZmFtaWx5X25hbWUiOiJOYWhlZW0iLCJjaXR5IjoiU3Rva2Utb24tVHJlbnQiLCJuYmYiOjE3MTg4MDIxMDcsImV4cCI6MTcxODgwNTcwNywiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzE2OSIsImF1ZCI6ImNpdHlpbmZvYXBpIn0.TBd7T4w8nGnl0F2NM8F4leE9sxJvuUe6VXYmQ2Hchw8
