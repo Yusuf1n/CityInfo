@@ -5,6 +5,7 @@ using Asp.Versioning.ApiExplorer;
 using CityInfo.API;
 using CityInfo.API.DbContexts;
 using CityInfo.API.Services;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -15,14 +16,32 @@ using Serilog;
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .WriteTo.Console()
-    .WriteTo.File("logs/cityinfo.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Logging.ClearProviders();
 //builder.Logging.AddConsole();
 
-builder.Host.UseSerilog();
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+if (environment == Environments.Development)
+{
+    builder.Host.UseSerilog(
+        (context, LoggerConfiguration) => LoggerConfiguration
+            .MinimumLevel.Debug()
+            .WriteTo.Console());
+}
+else
+{
+    builder.Host.UseSerilog((context, loggerConfiguration) => loggerConfiguration
+        .MinimumLevel.Debug()
+        .WriteTo.Console()
+        .WriteTo.File("logs/cityinfo.txt", rollingInterval: RollingInterval.Day)
+        .WriteTo.ApplicationInsights(new TelemetryConfiguration
+            {
+                InstrumentationKey = builder.Configuration["ApplicationInsightsInstrumentationKey"]
+            },
+            TelemetryConverter.Traces));
+}
 
 // Add services to the container.
 
