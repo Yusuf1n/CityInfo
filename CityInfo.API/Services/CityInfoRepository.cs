@@ -1,5 +1,6 @@
 ﻿using CityInfo.API.DbContexts;
 using CityInfo.API.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CityInfo.API.Services;
@@ -78,18 +79,46 @@ public class CityInfoRepository : ICityInfoRepository
         return await _context.Cities.AnyAsync(c => c.Id == cityId);
     }
 
+    public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId)
+    {
+        return await _context.PointsOfInterest
+            .Where(p => p.CityId == cityId)
+            .ToListAsync();
+    }
+
+
+    public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId, [FromQuery] string? name, [FromQuery] string? searchQuery)
+    {
+        var collection = _context.PointsOfInterest as IQueryable<PointOfInterest>;
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            name = name.Trim();
+
+            collection = collection.Where(c => c.Name == name);
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            searchQuery = searchQuery.Trim();
+
+            collection = collection.Where(a => a.Name.Contains(searchQuery)
+                                               || a.Description != null && a.Description.Contains(searchQuery));
+        }
+
+        var collectionToReturn = await collection
+            .Where(p => p.CityId == cityId)
+            .OrderBy(p => p.Name)
+            .ToListAsync();
+
+        return collectionToReturn;
+    }
+
     public async Task<PointOfInterest?> GetPointOfInterestForCityAsync(int cityId, int pointOfInterest)
     {
         return await _context.PointsOfInterest
             .Where(p => p.CityId == cityId && p.Id == pointOfInterest)
             .FirstOrDefaultAsync();
-    }
-
-    public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId)
-    {
-        return await _context.PointsOfInterest
-                            .Where(p => p.CityId == cityId)
-                            .ToListAsync();
     }
 
     public async Task AddPointOfInterestForCityAsync(int cityId, PointOfInterest pointOfInterest)

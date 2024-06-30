@@ -35,7 +35,7 @@ public class PointsOfInterestController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PointOfInterestDto>>> GetPointsOfInterest(int cityId)
+    public async Task<ActionResult<IEnumerable<PointOfInterestDto>>> GetPointsOfInterest(int cityId, [FromQuery] string? name, [FromQuery] string? searchQuery)
     {
         //var cityName = User.Claims.FirstOrDefault(c => c.Type == "city")?.Value;
 
@@ -51,7 +51,7 @@ public class PointsOfInterestController : ControllerBase
             return NotFound();
         }
 
-        var pointsOfInterestForCity = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId);
+        var pointsOfInterestForCity = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId, name, searchQuery);
 
         return Ok(_mapper.Map<IEnumerable<PointOfInterestDto>>(pointsOfInterestForCity));
     }
