@@ -13,6 +13,16 @@
             <returns>An IActionResult</returns>
             <response code="200">Returns the requested city</response>
         </member>
+        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.GetPointsOfInterest(System.Int32,System.String,System.String)">
+            <summary>
+            Get points of interest for a city, includes the ability to search and filter,
+            </summary>
+            <param name="cityId">The id of the city related to the points of interest to get</param>
+            <param name="name">Filtering the points of interest to get</param>
+            <param name="searchQuery">Searching the points of interest to get</param>
+            <returns>An ActionResult</returns>
+            <returns> code="200">Returns the requested point of interest</returns>
+        </member>
         <member name="T:CityInfo.API.Models.CityWithoutPointsOfInterestDto">
             <summary>
             A DTO for a city without points of interest
@@ -29,6 +39,26 @@
             </summary>
         </member>
         <member name="P:CityInfo.API.Models.CityWithoutPointsOfInterestDto.Description">
+            <summary>
+            The description of the city
+            </summary>
+        </member>
+        <member name="T:CityInfo.API.Models.PointOfInterestDto">
+            <summary>
+            A DTO for a cities points of interest
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.PointOfInterestDto.Id">
+            <summary>
+            The id of the city
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.PointOfInterestDto.Name">
+            <summary>
+            The name of the city
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.PointOfInterestDto.Description">
             <summary>
             The description of the city
             </summary>

@@ -34,16 +34,19 @@ public class PointsOfInterestController : ControllerBase
                   ?? throw new ArgumentNullException(nameof(mapper));
     }
 
+    /// <summary>
+    /// Get points of interest for a city, includes the ability to search and filter,
+    /// </summary>
+    /// <param name="cityId">The id of the city related to the points of interest to get</param>
+    /// <param name="name">Filtering the points of interest to get</param>
+    /// <param name="searchQuery">Searching the points of interest to get</param>
+    /// <returns>An ActionResult</returns>
+    /// <returns> code="200">Returns the requested point of interest</returns>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PointOfInterestDto>>> GetPointsOfInterest(int cityId, [FromQuery] string? name, [FromQuery] string? searchQuery)
     {
-        //var cityName = User.Claims.FirstOrDefault(c => c.Type == "city")?.Value;
-
-        //if (!await _cityInfoRepository.CityNameMatchesCityId(cityName, cityId))
-        //{
-        //    return Forbid();
-        //}
-
         if (!await _cityInfoRepository.CityExistsAsync(cityId))
         {
             _logger.LogError($"City with id {cityId} wasn't found when accessing points of interest.");
