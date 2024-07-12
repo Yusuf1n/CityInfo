@@ -1,4 +1,5 @@
 ﻿using CityInfo.API.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Services;
 
@@ -13,6 +14,8 @@ public interface ICityInfoRepository
     Task<bool> CityExistsAsync(int cityId);
 
     Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId);
+
+    Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId, [FromQuery] string? name, string? searchQuery);
 
     Task<PointOfInterest?> GetPointOfInterestForCityAsync(int cityId, int pointOfInterest);
 
