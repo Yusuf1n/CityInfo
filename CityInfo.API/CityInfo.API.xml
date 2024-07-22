@@ -13,7 +13,7 @@
             <returns>An IActionResult</returns>
             <response code="200">Returns the requested city</response>
         </member>
-        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.GetPointsOfInterest(System.Int32,System.String,System.String)">
+        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.GetPointsOfInterest(System.Int32,System.String,System.String,System.Int32,System.Int32)">
             <summary>
             Get points of interest for a city, includes the ability to search and filter,
             </summary>

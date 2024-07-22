@@ -19,6 +19,8 @@ public class PointsOfInterestController : ControllerBase
     private readonly ICityInfoRepository _cityInfoRepository;
     private readonly IMapper _mapper;
 
+    private const int maxPageSize = 20;
+
     public PointsOfInterestController(ILogger<PointsOfInterestController> logger, 
         IMailService mailService,
         ICityInfoRepository cityInfoRepository,
@@ -45,8 +47,13 @@ public class PointsOfInterestController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<PointOfInterestDto>>> GetPointsOfInterest(int cityId, [FromQuery] string? name, [FromQuery] string? searchQuery)
+    public async Task<ActionResult<IEnumerable<PointOfInterestDto>>> GetPointsOfInterest(int cityId, [FromQuery] string? name, [FromQuery] string? searchQuery, int pageNumber = 1, int pageSize = 10)
     {
+        if (pageSize > maxPageSize)
+        {
+            pageSize = maxPageSize;
+        }
+
         if (!await _cityInfoRepository.CityExistsAsync(cityId))
         {
             _logger.LogError($"City with id {cityId} wasn't found when accessing points of interest.");
@@ -54,7 +61,7 @@ public class PointsOfInterestController : ControllerBase
             return NotFound();
         }
 
-        var pointsOfInterestForCity = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId, name, searchQuery);
+        var pointsOfInterestForCity = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId, name, searchQuery, pageNumber, pageSize);
 
         return Ok(_mapper.Map<IEnumerable<PointOfInterestDto>>(pointsOfInterestForCity));
     }
