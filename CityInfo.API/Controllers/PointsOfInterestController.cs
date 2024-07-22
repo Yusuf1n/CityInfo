@@ -5,6 +5,7 @@ using CityInfo.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace CityInfo.API.Controllers;
 
@@ -61,9 +62,11 @@ public class PointsOfInterestController : ControllerBase
             return NotFound();
         }
 
-        var pointsOfInterestForCity = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId, name, searchQuery, pageNumber, pageSize);
+        var (pointsOfInterestForCityEntities, paginationMetadata) = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId, name, searchQuery, pageNumber, pageSize);
 
-        return Ok(_mapper.Map<IEnumerable<PointOfInterestDto>>(pointsOfInterestForCity));
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+        return Ok(_mapper.Map<IEnumerable<PointOfInterestDto>>(pointsOfInterestForCityEntities));
     }
 
     [HttpGet("{pointofinterestid}", Name = "GetPointOfInterest")]

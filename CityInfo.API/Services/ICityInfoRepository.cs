@@ -15,7 +15,7 @@ public interface ICityInfoRepository
 
     Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId);
 
-    Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId, [FromQuery] string? name, string? searchQuery, int pageNumber, int pageSize);
+    Task<(IEnumerable<PointOfInterest>, PaginationMetadata)> GetPointsOfInterestForCityAsync(int cityId, [FromQuery] string? name, string? searchQuery, int pageNumber, int pageSize);
 
     Task<PointOfInterest?> GetPointOfInterestForCityAsync(int cityId, int pointOfInterest);
 
