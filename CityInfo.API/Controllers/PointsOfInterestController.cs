@@ -44,6 +44,8 @@ public class PointsOfInterestController : ControllerBase
     /// <param name="cityId">The id of the city related to the points of interest to get</param>
     /// <param name="name">Filtering the points of interest to get</param>
     /// <param name="searchQuery">Searching the points of interest to get</param>
+    /// <param name="pageNumber">Page number the user has selected, defaults to 1 if none provided</param>
+    /// <param name="pageSize">Records to return in a page, defaults to 10 if none provided</param>
     /// <returns>An ActionResult</returns>
     /// <returns> code="200">Returns the requested point of interest</returns>
     [HttpGet]
@@ -60,7 +62,7 @@ public class PointsOfInterestController : ControllerBase
         {
             _logger.LogError($"City with id {cityId} wasn't found when accessing points of interest.");
 
-            return NotFound();
+            return NotFound($"City with id {cityId} wasn't found when accessing points of interest.");
         }
 
         var (pointsOfInterestForCityEntities, paginationMetadata) = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId, name, searchQuery, pageNumber, pageSize);
@@ -69,7 +71,7 @@ public class PointsOfInterestController : ControllerBase
         {
             _logger.LogError($"There are no Points of Interest for City with the id of {cityId}.");
 
-            return NotFound();
+            return NotFound($"There are no Points of Interest for City with the id of {cityId}.");
         }
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));

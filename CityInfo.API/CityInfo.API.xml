@@ -20,6 +20,8 @@
             <param name="cityId">The id of the city related to the points of interest to get</param>
             <param name="name">Filtering the points of interest to get</param>
             <param name="searchQuery">Searching the points of interest to get</param>
+            <param name="pageNumber">Page number the user has selected, defaults to 1 if none provided</param>
+            <param name="pageSize">Records to return in a page, defaults to 10 if none provided</param>
             <returns>An ActionResult</returns>
             <returns> code="200">Returns the requested point of interest</returns>
         </member>
