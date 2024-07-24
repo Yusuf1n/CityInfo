@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CityInfo.API.Controllers;
 
@@ -63,6 +64,13 @@ public class PointsOfInterestController : ControllerBase
         }
 
         var (pointsOfInterestForCityEntities, paginationMetadata) = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId, name, searchQuery, pageNumber, pageSize);
+
+        if (pointsOfInterestForCityEntities.IsNullOrEmpty())
+        {
+            _logger.LogError($"There are no Points of Interest for City with the id of {cityId}.");
+
+            return NotFound();
+        }
 
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
