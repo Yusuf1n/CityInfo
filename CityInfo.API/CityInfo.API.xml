@@ -13,13 +13,15 @@
             <returns>An IActionResult</returns>
             <response code="200">Returns the requested city</response>
         </member>
-        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.GetPointsOfInterest(System.Int32,System.String,System.String)">
+        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.GetPointsOfInterest(System.Int32,System.String,System.String,System.Int32,System.Int32)">
             <summary>
             Get points of interest for a city, includes the ability to search and filter,
             </summary>
             <param name="cityId">The id of the city related to the points of interest to get</param>
             <param name="name">Filtering the points of interest to get</param>
             <param name="searchQuery">Searching the points of interest to get</param>
+            <param name="pageNumber">Page number the user has selected, defaults to 1 if none provided</param>
+            <param name="pageSize">Records to return in a page, defaults to 10 if none provided</param>
             <returns>An ActionResult</returns>
             <returns> code="200">Returns the requested point of interest</returns>
         </member>
